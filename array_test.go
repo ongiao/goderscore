@@ -78,6 +78,30 @@ func TestConcat(t *testing.T) {
 	})
 }
 
+func TestContains(t *testing.T) {
+	t.Run("Test contains 1", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5}
+
+		got, _ := slice.Contains(3)
+		want := true
+
+		if got != want {
+			t.Error("Contains failed")
+		}
+	})
+
+	t.Run("Test contains 2", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5}
+
+		got, _ := slice.Contains(8)
+		want := false
+
+		if got != want {
+			t.Error("Contains failed")
+		}
+	})
+}
+
 func TestDifference(t *testing.T) {
 	t.Run("Test difference", func(t *testing.T) {
 		slice := GoSlice{3,2,1}
@@ -270,18 +294,358 @@ func TestFlatten(t *testing.T) {
 
 		assertDeepEqual(t, got, want, "Flatten failed")
 	})
+
+	t.Run("Test flatten 3", func(t *testing.T) {
+		slice := GoSlice{}
+
+		got := slice.FlattenDeep()
+		want := GoSlice{}
+
+		assertDeepEqual(t, got, want, "Flatten failed")
+	})
 }
 
-//func TestFlattenDeep(t *testing.T) {
-//	t.Run("Test flatten deep", func(t *testing.T) {
-//		slice := GoSlice{1, GoSlice{2, GoSlice{3, GoSlice{4}}}, 5}
-//
-//		got := slice.Flatten()
-//		want := GoSlice{1, 2, 3, 4, 5}
-//
-//		assertDeepEqual(t, got, want, "Flatten failed")
-//	})
-//}
+func TestFlattenDeep(t *testing.T) {
+	t.Run("Test flatten deep 1", func(t *testing.T) {
+		slice := GoSlice{1, GoSlice{2, GoSlice{3, GoSlice{4}}}, 5}
+
+		got := slice.FlattenDeep()
+		want := GoSlice{1, 2, 3, 4, 5}
+
+		assertDeepEqual(t, got, want, "FlattenDeep failed")
+	})
+
+	t.Run("Test flatten deep 2", func(t *testing.T) {
+		slice := GoSlice{}
+
+		got := slice.FlattenDeep()
+		want := GoSlice{}
+
+		assertDeepEqual(t, got, want, "FlattenDeep failed")
+	})
+}
+
+func TestFlattenDepth(t *testing.T) {
+	t.Run("Test flatten depth", func(t *testing.T) {
+		slice := GoSlice{1, GoSlice{2, GoSlice{3, GoSlice{4}}}, 5}
+
+		got := slice.FlattenDepth(2)
+		want := GoSlice{1, 2, 3, GoSlice{4}, 5}
+
+		assertDeepEqual(t, got, want, "FlattenDeep failed")
+	})
+}
+
+func TestIndexOf(t *testing.T) {
+	t.Run("Test index of 1", func(t *testing.T) {
+		slice := GoSlice{1, 2, 3, 4, 5}
+		searchNum := 3
+
+		got1, _ := slice.IndexOf(searchNum, 3)
+		want1 := -1
+
+		if got1 != want1 {
+			t.Error("IndexOf failed")
+		}
+
+		got2, _ := slice.IndexOf(searchNum, 0)
+		want2 := 2
+
+		if got2 != want2 {
+			t.Error("IndexOf failed")
+		}
+
+		otherSlice := GoSlice{2,3,4,5,3,1}
+
+		got3, _ := otherSlice.IndexOf(searchNum, -1)
+		want3 := 4
+
+		if got3 != want3 {
+			t.Error("IndexOf failed")
+		}
+	})
+}
+
+func TestInitial(t *testing.T) {
+	t.Run("Test initial", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5}
+
+		got := slice.Initial()
+		want := GoSlice{1,2,3,4}
+
+		assertDeepEqual(t, got, want, "Initial failed")
+	})
+}
+
+func TestIntersection(t *testing.T) {
+	t.Run("Test intersection", func(t *testing.T) {
+		a := GoSlice{2,1}
+		b := GoSlice{4,2,1}
+		c := GoSlice{1,2}
+		d := GoSlice{3,1,2}
+
+		got := a.Intersection(b, c, d)
+		want := GoSlice{1,2}
+
+		assertSliceHasSameElems(t, got, want, "Intersection failed")
+	})
+}
+
+func TestJoin(t *testing.T) {
+	t.Run("Test join 1", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5}
+
+		got := slice.Join("")
+		want := "12345"
+
+		if got != want {
+			t.Error("Join failed")
+		}
+	})
+
+	t.Run("Test join 2", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5}
+
+		got := slice.Join("-")
+		want := "1-2-3-4-5"
+
+		if got != want {
+			t.Error("Join failed")
+		}
+	})
+
+	t.Run("Test join 3", func(t *testing.T) {
+		slice := GoSlice{"Jack","is","Junxing"}
+
+		got := slice.Join("-")
+		want := "Jack-is-Junxing"
+
+		if got != want {
+			t.Error("Join failed")
+		}
+	})
+}
+
+func TestLast(t *testing.T) {
+	t.Run("Test last 1", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5}
+
+		got := slice.Last()
+		want := 5
+
+		if got != want {
+			t.Error("Last failed")
+		}
+	})
+
+	t.Run("Test last 2", func(t *testing.T) {
+		slice := GoSlice{"Jack", "is", "Junxing"}
+
+		got := slice.Last()
+		want := "Junxing"
+
+		if got != want {
+			t.Error("Last failed")
+		}
+	})
+}
+
+func TestLastIndexOf(t *testing.T) {
+	t.Run("Test last index of 1", func(t *testing.T) {
+		slice := GoSlice{1,2,1,2}
+
+		got, _ := slice.LastIndexOf(2, len(slice) - 1)
+		want := 3
+
+		if got != want {
+			t.Error("Last failed")
+		}
+	})
+
+	t.Run("Test last index of 2", func(t *testing.T) {
+		slice := GoSlice{1,2,1,2}
+
+		got, _ := slice.LastIndexOf(2, 2)
+		want := 1
+
+		if got != want {
+			t.Error("Last failed")
+		}
+	})
+
+	t.Run("Test last index of 2", func(t *testing.T) {
+		slice := GoSlice{1,2,1,2}
+
+		got, _ := slice.LastIndexOf(2, -1)
+		want := 1
+
+		if got != want {
+			t.Error("Last failed")
+		}
+	})
+}
+
+func TestNth(t *testing.T) {
+	t.Run("Test nth", func(t *testing.T) {
+		slice := GoSlice{"a","b","c","d"}
+
+		got := slice.Nth(1)
+		want := "b"
+
+		if got != want {
+			t.Error("Nth failed")
+		}
+	})
+}
+
+func TestUniq(t *testing.T) {
+	t.Run("Test uniq", func(t *testing.T) {
+		slice := GoSlice{2,3,4,5,3,2,1,9}
+
+		got := slice.Uniq()
+		want := GoSlice{2,3,4,5,1,9}
+
+		assertDeepEqual(t, got, want, "Uniq failed")
+	})
+}
+
+func TestPull(t *testing.T) {
+	t.Run("Test pull 1", func(t *testing.T) {
+		slice := GoSlice{1,2,3,1,2,3}
+
+		got := slice.Pull(2, 3)
+		want := GoSlice{1,1}
+
+		assertDeepEqual(t, got, want, "Pull failed")
+	})
+
+	t.Run("Test pull 2", func(t *testing.T) {
+		slice := GoSlice{1,2,3,1,2,3,4,5}
+
+		got := slice.Pull(7,8)
+		want := GoSlice{1,2,3,1,2,3,4,5}
+
+		assertDeepEqual(t, got, want, "Pull failed")
+	})
+}
+
+func TestPullAll(t *testing.T) {
+	t.Run("Test pull all", func(t *testing.T) {
+		slice := GoSlice{1,2,3,1,2,3}
+		values := GoSlice{2,3}
+
+		got := slice.PullAll(values)
+		want := GoSlice{1,1}
+
+		assertDeepEqual(t, got, want, "Pull all failed")
+	})
+}
+
+func TestPullAt(t *testing.T) {
+	t.Run("Test pull at", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5}
+
+		got := slice.PullAt(1,3)
+		want1 := GoSlice{2,4}
+		want2 := GoSlice{1,3,5}
+
+		assertDeepEqual(t, got, want1, "Pull at failed")
+		assertDeepEqual(t, slice, want2, "Pull at failed")
+	})
+}
+
+func TestReverse(t *testing.T) {
+	t.Run("Test reverse", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4}
+
+		got := slice.Reverse()
+		want := GoSlice{4,3,2,1}
+
+		assertDeepEqual(t, got, want, "Reverse failed")
+	})
+}
+
+func TestSlice(t *testing.T) {
+	t.Run("Test slice", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5,6}
+
+		got := slice.Slice(1, 5)
+		want := GoSlice{2,3,4,5}
+
+		assertDeepEqual(t, got, want, "Slice failed")
+	})
+}
+
+func TestTail(t *testing.T) {
+	t.Run("Test tail", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5,6}
+
+		got := slice.Tail()
+		want := GoSlice{2,3,4,5,6}
+
+		assertDeepEqual(t, got, want, "Tail failed")
+	})
+}
+
+func TestTake(t *testing.T) {
+	t.Run("Test take", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5,6}
+
+		got := slice.Take(3)
+		want := GoSlice{1,2,3}
+
+		assertDeepEqual(t, got, want, "Take failed")
+	})
+}
+
+func TestTakeRight(t *testing.T) {
+	t.Run("Test take right", func(t *testing.T) {
+		slice := GoSlice{1,2,3,4,5,6}
+
+		got := slice.TakeRight(3)
+		want := GoSlice{4,5,6}
+
+		assertDeepEqual(t, got, want, "Take right failed")
+	})
+}
+
+func TestUnion(t *testing.T) {
+	t.Run("Test union", func(t *testing.T) {
+		slice1 := GoSlice{2}
+		slice2 := GoSlice{2,1}
+		slice3 := GoSlice{2,4,7}
+
+		got := Union(slice1, slice2, slice3)
+		want := GoSlice{2,1,4,7}
+
+		assertDeepEqual(t, got, want, "Take union failed")
+	})
+}
+
+
+
+func assertSliceHasSameElems(t *testing.T, got, want interface{}, errMsg string) {
+	mapA := make(map[interface{}]int)
+	mapB := make(map[interface{}]int)
+
+	for _, n := range got.(GoSlice) {
+		if mapA[n] == 0 {
+			mapA[n] = 1
+		} else {
+			mapA[n]++
+		}
+	}
+
+	for _, n := range want.(GoSlice) {
+		if mapB[n] == 0 {
+			mapB[n] = 1
+		} else {
+			mapB[n]++
+		}
+	}
+
+	assertDeepEqual(t, mapA, mapB, errMsg)
+}
 
 func assertDeepEqual(t *testing.T, got, want interface{}, errMsg string) {
 	t.Helper()
