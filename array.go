@@ -44,6 +44,9 @@ func (g *GoSlice) Compact() GoSlice {
 }
 
 func (g *GoSlice) Concat(args ...interface{}) GoSlice {
+	res := make(GoSlice, len(*g))
+	copy(res, *g)
+
 	for _, item := range args {
 		itemType := reflect.TypeOf(item)
 
@@ -51,14 +54,14 @@ func (g *GoSlice) Concat(args ...interface{}) GoSlice {
 			values := reflect.ValueOf(item)
 
 			for index := 0; index < values.Len(); index++ {
-				*g = append(*g, values.Index(index).Interface())
+				res = append(res, values.Index(index).Interface())
 			}
 		} else {
-			*g = append(*g, item)
+			res = append(res, item)
 		}
 	}
 
-	return *g
+	return res
 }
 
 func (g *GoSlice) Contains(item interface{}) (bool, error) {
@@ -351,6 +354,7 @@ func (g *GoSlice) Nth(n int) interface{} {
 	}
 }
 
+// This method will change the values in the original slice
 func (g *GoSlice) Pull(items ...interface{}) GoSlice {
 	res := GoSlice{}
 	deleteNums := GoSlice{}
@@ -364,6 +368,8 @@ func (g *GoSlice) Pull(items ...interface{}) GoSlice {
 			res = append(res, n)
 		}
 	}
+
+	*g = res
 
 	return res
 }
@@ -469,3 +475,83 @@ func (g *GoSlice) Uniq() GoSlice {
 
 	return res
 }
+
+func Unzip(arrays ...GoSlice) GoSlice {
+	elemCount := -1
+
+	for _, arr := range arrays {
+		if elemCount == -1 {
+			elemCount = len(arr)
+		} else if elemCount == len(arr) {
+			continue
+		} else {
+			errors.New("Arguments have different length!")
+		}
+	}
+
+	res := GoSlice{}
+
+	for i := 0; i < elemCount; i++ {
+		temp := GoSlice{}
+
+		for _, arr := range arrays {
+			temp = append(temp, arr[i])
+		}
+		res = append(res, temp)
+	}
+
+	return res
+}
+
+//func UnzioWith() {}
+
+// This method has same funtionality of Pull but it will not change
+// the values of the original slice
+func (g *GoSlice) Without(items ...interface{}) GoSlice {
+	res := GoSlice{}
+	deleteNums := GoSlice{}
+
+	for _, n := range items {
+		deleteNums = append(deleteNums, n)
+	}
+
+	for _, n := range *g {
+		if ok, _ := deleteNums.Contains(n); !ok {
+			res = append(res, n)
+		}
+	}
+
+	return res
+}
+
+func Xor(arrays ...GoSlice) GoSlice {
+	if len(arrays) == 0 {
+		return GoSlice{}
+	} else if len(arrays) == 1 {
+		return arrays[0]
+	} else {
+		res := GoSlice{}
+		res = append(res, arrays[0]...)
+		res = res.Uniq()
+
+		for i := 1; i < len(arrays); i++ {
+			arrUniq := arrays[i].Uniq()
+
+			for _, n := range arrUniq {
+				if index, _ := res.IndexOf(n, 0); index == -1 {
+					res = append(res, n)
+				} else {
+					res = res.Without(n)
+				}
+			}
+		}
+
+		return res
+	}
+}
+
+func Zip(arrays ...GoSlice) GoSlice {
+	return Unzip(arrays...)
+}
+
+//func ZipWith() {}

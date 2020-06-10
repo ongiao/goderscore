@@ -516,6 +516,7 @@ func TestPull(t *testing.T) {
 		got := slice.Pull(2, 3)
 		want := GoSlice{1,1}
 
+		assertDeepEqual(t, slice, want, "Pull failed")
 		assertDeepEqual(t, got, want, "Pull failed")
 	})
 
@@ -525,6 +526,7 @@ func TestPull(t *testing.T) {
 		got := slice.Pull(7,8)
 		want := GoSlice{1,2,3,1,2,3,4,5}
 
+		assertDeepEqual(t, slice, want, "Pull failed")
 		assertDeepEqual(t, got, want, "Pull failed")
 	})
 }
@@ -622,7 +624,53 @@ func TestUnion(t *testing.T) {
 	})
 }
 
+func TestUnzip(t *testing.T) {
+	t.Run("Test unzip", func(t *testing.T) {
+		slice1 := GoSlice{"fred","barney"}
+		slice2 := GoSlice{30,40}
+		slice3 := GoSlice{true,false}
 
+		got := Unzip(slice1, slice2, slice3)
+		want := GoSlice{GoSlice{"fred",30,true}, GoSlice{"barney",40,false}}
+
+		assertDeepEqual(t, got, want, "Unzip failed")
+	})
+}
+
+func TestWithout(t *testing.T) {
+	t.Run("Test without", func(t *testing.T) {
+		slice := GoSlice{1,2,3,1,2,3}
+
+		got := slice.Pull(2, 3)
+		want := GoSlice{1,1}
+
+		assertDeepEqual(t, got, want, "Without failed")
+	})
+}
+
+func TestXor(t *testing.T) {
+	t.Run("Test xor", func(t *testing.T) {
+		slice1 := GoSlice{2,1}
+		slice2 := GoSlice{2,3}
+
+		got := Xor(slice1, slice2)
+		want := GoSlice{1,3}
+
+		assertDeepEqual(t, got, want, "Xor failed")
+	})
+}
+
+func TestZip(t *testing.T) {
+	t.Run("Test zip", func(t *testing.T) {
+		slice1 := GoSlice{"a",1,true}
+		slice2 := GoSlice{"b",2,false}
+
+		got := Zip(slice1, slice2)
+		want := GoSlice{GoSlice{"a","b"},GoSlice{1,2},GoSlice{true,false}}
+
+		assertDeepEqual(t, got, want, "Zip failed")
+	})
+}
 
 func assertSliceHasSameElems(t *testing.T, got, want interface{}, errMsg string) {
 	mapA := make(map[interface{}]int)
