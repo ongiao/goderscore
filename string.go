@@ -326,3 +326,66 @@ func TrimEnd(str, chars string) string {
 func TrimStart(str, chars string) string {
 	return strings.TrimLeft(str, chars)
 }
+
+func Unescape(str string) string {
+	return html.UnescapeString(str)
+}
+
+func UpperCase(str string) string {
+	reg, err := regexp.Compile("[^a-zA-Z]+")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	processedStr := strings.TrimSpace(reg.ReplaceAllString(str, " "))
+
+	allUpperCase := true
+	var upperCaseIndexes []int
+	for i, ch := range processedStr {
+		if ch >= 65 && ch <= 90 {
+			upperCaseIndexes = append(upperCaseIndexes, i)
+		} else if ch == 32 {
+		} else {
+			allUpperCase = false
+		}
+	}
+
+	if allUpperCase {
+		return processedStr
+	}
+
+	if len(upperCaseIndexes) > 0 {
+		for _, index := range upperCaseIndexes {
+			if index != 0 && processedStr[index-1] != ' ' {
+				processedStr = processedStr[:index] + " " + processedStr[index:]
+			}
+		}
+	}
+
+	return strings.ToUpper(processedStr)
+}
+
+func UpperFirst(str string) string {
+	return strings.Title(str)
+}
+
+func Words(str string) []string {
+	reg, err := regexp.Compile("[^a-z0-9A-Z]+")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return strings.Split(reg.ReplaceAllString(str, " "), " ")
+}
+
+func WordsWith(str, pattern string) []string {
+	reg, err := regexp.Compile(pattern)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return strings.Split(reg.ReplaceAllString(str, " "), " ")
+}

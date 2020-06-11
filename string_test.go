@@ -493,6 +493,84 @@ func TestTrimStart(t *testing.T) {
 	})
 }
 
+func TestUnescape(t *testing.T) {
+	t.Run("Test Unescape", func(t *testing.T) {
+		str := "fred, barney, &amp; pebbles"
+
+		got := Unescape(str)
+		want := "fred, barney, & pebbles"
+
+		assertDeepEqual(t, got, want, "Unescape failed")
+
+	})
+}
+
+func TestUpperCase(t *testing.T) {
+	t.Run("Test UpperCase", func(t *testing.T) {
+		str1 := "--Foo-Bar--"
+
+		got := UpperCase(str1)
+		want := "FOO BAR"
+
+		assertEqual(t, got, want, "UpperCase failed")
+
+		str2 := "fooBar"
+
+		got = UpperCase(str2)
+		want = "FOO BAR"
+
+		assertEqual(t, got, want, "UpperCase failed")
+
+		str3 := "__FOO_BAR__"
+
+		got = UpperCase(str3)
+		want = "FOO BAR"
+
+		assertEqual(t, got, want, "UpperCase failed")
+	})
+}
+
+func TestUpperFirst(t *testing.T) {
+	t.Run("Test UpperFirst", func(t *testing.T) {
+		str1 := "fred"
+
+		got := UpperFirst(str1)
+		want := "Fred"
+
+		assertEqual(t, got, want, "UpperFirst failed")
+
+		str2 := "FRED"
+
+		got = UpperFirst(str2)
+		want = "FRED"
+
+		assertEqual(t, got, want, "UpperFirst failed")
+	})
+}
+
+func TestWords(t *testing.T) {
+	t.Run("Test Words", func(t *testing.T) {
+		str := "fred, barney, & pebbles"
+
+		got := Words(str)
+		want := []string{"fred", "barney", "pebbles"}
+
+		assertDeepEqual(t, got, want, "Words failed")
+	})
+}
+
+func TestWordsWith(t *testing.T) {
+	t.Run("Test WordsWith", func(t *testing.T) {
+		str := "fred, barney, & pebbles"
+		pattern := "[, ]+"
+
+		got := WordsWith(str, pattern)
+		want := []string{"fred", "barney", "&", "pebbles"}
+
+		assertDeepEqual(t, got, want, "WordsWith failed")
+	})
+}
+
 func assertEqual(t *testing.T, got, want interface{}, errMsg string) {
 	t.Helper()
 
