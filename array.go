@@ -64,21 +64,30 @@ func (g *GoSlice) Concat(args ...interface{}) GoSlice {
 	return res
 }
 
-func (g *GoSlice) Contains(item interface{}) (bool, error) {
+func (g *GoSlice) Contains(item interface{}) bool {
 	for _, n := range *g {
 		if n == item {
-			return true, nil
+			return true
 		}
 	}
 
-	return false, errors.New("not in array")
+	return false
 }
 
-func (g *GoSlice) Difference(slice GoSlice) GoSlice {
+func (g *GoSlice) Difference(slices ...GoSlice) GoSlice {
 	res := GoSlice{}
+	combination := GoSlice{}
+
+	for _, m := range slices {
+		for _, n := range m {
+			combination = append(combination, n)
+		}
+	}
+
+	combination.Uniq()
 
 	for _, n := range *g {
-		if _, ok := slice.IndexOf(n, 0); !ok{
+		if _, ok := combination.IndexOf(n, 0); !ok{
 			res = append(res, n)
 		}
 	}
@@ -86,15 +95,25 @@ func (g *GoSlice) Difference(slice GoSlice) GoSlice {
 	return res
 }
 
-// 缺少类型检查
-func (g *GoSlice) DifferenceBy(otherSlice GoSlice, iteratee Iteratee) GoSlice {
+func (g *GoSlice) DifferenceBy(iteratee Iteratee, slices ...GoSlice) GoSlice {
+	defer CatchPanic()
+
 	newSlice := (*g).Map(iteratee)
-	newOtherSlice := otherSlice.Map(iteratee)
+	combination := GoSlice{}
+
+	for _, m := range slices {
+		for _, n := range m {
+			combination = append(combination, n)
+		}
+	}
+
+	combination = combination.Uniq()
+	newCombination := combination.Map(iteratee)
 
 	res := GoSlice{}
 
 	for i, n := range newSlice {
-		if _, ok := newOtherSlice.IndexOf(n, 0); !ok {
+		if _, ok := newCombination.IndexOf(n, 0); !ok {
 			res = append(res, (*g)[i])
 		}
 	}
@@ -102,7 +121,7 @@ func (g *GoSlice) DifferenceBy(otherSlice GoSlice, iteratee Iteratee) GoSlice {
 	return res
 }
 
-//func (g *GoSlice) DifferenceWith(otherSlice GoSlice, comparator Comparator) GoSlice {
+//func (g *GoSlice) DifferenceWith(comparator Comparator, slices ...GoSlice) GoSlice {
 //
 //}
 
@@ -355,7 +374,7 @@ func (g *GoSlice) Nth(n int) interface{} {
 }
 
 // This method will change the values in the original slice
-func (g *GoSlice) Pull(items ...interface{}) GoSlice {
+func (g *GoSlice) Pull(items ...T) GoSlice {
 	res := GoSlice{}
 	deleteNums := GoSlice{}
 
@@ -364,7 +383,7 @@ func (g *GoSlice) Pull(items ...interface{}) GoSlice {
 	}
 
 	for _, n := range *g {
-		if ok, _ := deleteNums.Contains(n); !ok {
+		if ok := deleteNums.Contains(n); !ok {
 			res = append(res, n)
 		}
 	}
@@ -399,7 +418,7 @@ func (g *GoSlice) PullAt(index ...int) GoSlice {
 
 	newG := GoSlice{}
 	for i, n := range *g {
-		if ok, _ := removeIndexes.Contains(i); !ok {
+		if ok := removeIndexes.Contains(i); !ok {
 			newG = append(newG, n)
 		}
 	}
@@ -516,7 +535,7 @@ func (g *GoSlice) Without(items ...interface{}) GoSlice {
 	}
 
 	for _, n := range *g {
-		if ok, _ := deleteNums.Contains(n); !ok {
+		if ok := deleteNums.Contains(n); !ok {
 			res = append(res, n)
 		}
 	}

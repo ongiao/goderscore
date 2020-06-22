@@ -82,7 +82,7 @@ func TestContains(t *testing.T) {
 	t.Run("Test contains 1", func(t *testing.T) {
 		slice := GoSlice{1,2,3,4,5}
 
-		got, _ := slice.Contains(3)
+		got := slice.Contains(3)
 		want := true
 
 		if got != want {
@@ -93,7 +93,7 @@ func TestContains(t *testing.T) {
 	t.Run("Test contains 2", func(t *testing.T) {
 		slice := GoSlice{1,2,3,4,5}
 
-		got, _ := slice.Contains(8)
+		got := slice.Contains(8)
 		want := false
 
 		if got != want {
@@ -111,18 +111,24 @@ func TestDifference(t *testing.T) {
 		want := GoSlice{3,1}
 
 		assertDeepEqual(t, got, want, "Difference failed")
+
+		got = slice.Difference(GoSlice{2,3}, GoSlice{3,4})
+		want = GoSlice{1}
+
+		assertDeepEqual(t, got, want, "Difference failed")
 	})
 }
 
 func TestDifferenceBy(t *testing.T) {
 	t.Run("Test difference by string", func(t *testing.T) {
-		slice := GoSlice{"junxing", "jack", "marnie"}
+		slice := GoSlice{"junxing", "jack", "marnie", "jaz"}
 		otherSlice := GoSlice{"jack", "marnie"}
+		otherSlice1 := GoSlice{"jaz"}
 
 
-		got := slice.DifferenceBy(otherSlice, func(i interface{}) interface{} {
+		got := slice.DifferenceBy(func(i interface{}) interface{} {
 			return strings.ToUpper(i.(string))
-		})
+		}, otherSlice, otherSlice1)
 		want := GoSlice{"junxing"}
 
 		assertDeepEqual(t, got, want, "Difference by failed")
@@ -131,12 +137,13 @@ func TestDifferenceBy(t *testing.T) {
 	t.Run("Test difference by int", func(t *testing.T) {
 		slice := GoSlice{3.1, 2.2, 1.3}
 		otherSlice := GoSlice{4.4, 2.5}
+		otherSlice1 := GoSlice{1.7}
 
 
-		got := slice.DifferenceBy(otherSlice, func(i interface{}) interface{} {
+		got := slice.DifferenceBy(func(i interface{}) interface{} {
 			return math.Floor(i.(float64))
-		})
-		want := GoSlice{3.1, 1.3}
+		}, otherSlice, otherSlice1)
+		want := GoSlice{3.1}
 
 		assertDeepEqual(t, got, want, "Difference by failed")
 	})
@@ -699,7 +706,7 @@ func assertDeepEqual(t *testing.T, got, want interface{}, errMsg string) {
 	t.Helper()
 
 	if !(reflect.DeepEqual(got, want)) {
-		fmt.Println(got, want)
+		fmt.Printf("We got %v, but we actually want %v", got, want)
 		t.Error(errMsg)
 	}
 }

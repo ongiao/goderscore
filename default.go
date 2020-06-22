@@ -1,10 +1,14 @@
 package goderscore
 
-type GoSlice []interface{}
+import "fmt"
+
+type T interface {}
+
+type GoSlice []T
 
 type Iteratee func(interface{}) interface{}
 
-type Comparator func(interface{}) bool
+type Comparator func(T, T) bool
 
 //type Predicate func(map[string]bool) bool
 //
@@ -20,5 +24,11 @@ func (g *GoSlice) Map(iteratee Iteratee) GoSlice {
 	}
 
 	return res
+}
+
+func CatchPanic() {
+	if r := recover(); r != nil {
+		fmt.Printf("Caught error：%s\n", r)
+	}
 }
 
